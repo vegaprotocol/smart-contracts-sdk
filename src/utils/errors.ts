@@ -1,4 +1,4 @@
-import { TxError } from "../contracts/vega-web3-types";
+import { TxError } from '../contracts/vega-web3-types';
 
 /**
  * Error codes returned from Metamask that we can safely not capture in Sentry
