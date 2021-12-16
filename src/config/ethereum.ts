@@ -1,18 +1,11 @@
+import { Networks } from './vega';
+
 const customVegaTokenAddress = process.env.CUSTOM_TOKEN_ADDRESS as string;
 const customClaimAddress = process.env.CUSTOM_CLAIM_ADDRESS as string;
 const customLockedAddress = process.env.CUSTOM_LOCKED_ADDRESS as string;
 const customVestingAddress = process.env.CUSTOM_VESTING_ADDRESS as string;
 const customStakingBridge = process.env.CUSTOM_STAKING_BRIDGE as string;
 const customErc20Bridge = process.env.CUSTOM_ERC20_BRIDGE as string;
-
-export enum Networks {
-  CUSTOM = 'CUSTOM',
-  TESTNET = 'TESTNET',
-  STAGNET = 'STAGNET',
-  STAGNET2 = 'STAGNET2',
-  DEVNET = 'DEVNET',
-  MAINNET = 'MAINNET',
-}
 
 export type EthereumChainId = '0x1' | '0x3' | '0x4' | '0x5' | '0x2a';
 
