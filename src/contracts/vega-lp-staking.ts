@@ -7,7 +7,7 @@ import { addDecimal, removeDecimal } from '../utils/decimals';
 import { IVegaLPStaking } from './interfaces';
 import { EpochDetails } from './vega-web3-types';
 
-export default class VegaLPStaking implements IVegaLPStaking {
+export class VegaLPStaking implements IVegaLPStaking {
   private contract: ethers.Contract;
   public readonly address: string;
 

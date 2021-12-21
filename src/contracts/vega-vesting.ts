@@ -8,7 +8,7 @@ import { combineStakeEventsByVegaKey } from './stake-helpers';
 import { getTranchesFromHistory } from './tranche-helpers';
 import { Tranche } from './vega-web3-types';
 
-export default class VegaVesting implements IVegaVesting {
+export class VegaVesting implements IVegaVesting {
   private contract: ethers.Contract;
   private decimals: number;
 

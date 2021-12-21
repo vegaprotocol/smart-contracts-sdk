@@ -19,7 +19,9 @@
     "size": "size-limit",
     "analyze": "size-limit --why"
   },
-  "peerDependencies": {},
+  "peerDependencies": {
+    "lodash": "^4.17.21"
+  },
   "husky": {
     "hooks": {
       "pre-commit": "tsdx lint"
@@ -31,7 +33,7 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "smart-contracts-sdk",
+  "name": "@vegaprotocol/smart-contracts-sdk",
   "author": "Dexter",
   "module": "dist/smart-contracts-sdk.esm.js",
   "size-limit": [

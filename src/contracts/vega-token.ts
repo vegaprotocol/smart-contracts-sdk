@@ -5,7 +5,7 @@ import tokenAbi from '../abis/vega_token_abi.json';
 import { addDecimal, removeDecimal } from '../utils/decimals';
 import { IVegaToken } from './interfaces';
 
-export default class VegaToken implements IVegaToken {
+export class VegaToken implements IVegaToken {
   private contract: ethers.Contract;
 
   constructor(

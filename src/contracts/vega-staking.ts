@@ -7,7 +7,7 @@ import { addDecimal, removeDecimal } from '../utils/decimals';
 import BigNumber from 'bignumber.js';
 import { IVegaStaking } from './interfaces';
 
-export default class StakingAbi implements IVegaStaking {
+export class StakingAbi implements IVegaStaking {
   private contract: ethers.Contract;
   private decimals: number;
 

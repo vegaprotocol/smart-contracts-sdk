@@ -23,14 +23,14 @@ export const SPENT_CODE = '0x0000000000000000000000000000000000000001';
  * contract.isClaimValid({ claimCode: "0x...", expiry: 0, nonce: "0x00", account: "0x00" })
  * ```
  */
-export default class VegaClaim implements IVegaClaim {
-  private provider: ethers.providers.Web3Provider;
+export class VegaClaim implements IVegaClaim {
+  private provider: ethers.providers.BaseProvider;
   private contract: ethers.Contract;
   decimals: number;
 
   constructor(
-    provider: ethers.providers.Web3Provider,
-    signer: ethers.Signer,
+    provider: ethers.providers.BaseProvider,
+    signer: ethers.Signer | null,
     claimAddress: string,
     decimals: number
   ) {
@@ -76,7 +76,11 @@ export default class VegaClaim implements IVegaClaim {
     ](
       ...[
         { r, s, v },
-        { amount: removeDecimal(amount, this.decimals), tranche, expiry },
+        {
+          amount: removeDecimal(amount, this.decimals),
+          tranche,
+          expiry,
+        },
         asciiToHex(country),
         target,
       ].filter(Boolean)
