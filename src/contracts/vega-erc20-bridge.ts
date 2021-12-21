@@ -7,7 +7,7 @@ export class VegaErc20Bridge implements IVegaErc20Bridge {
   private contract: ethers.Contract;
 
   constructor(
-    provider: ethers.providers.Web3Provider,
+    provider: ethers.providers.BaseProvider,
     signer: ethers.Signer | null,
     address: string
   ) {

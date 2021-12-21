@@ -9,8 +9,8 @@ export class VegaToken implements IVegaToken {
   private contract: ethers.Contract;
 
   constructor(
-    provider: ethers.providers.Web3Provider,
-    signer: ethers.Signer,
+    provider: ethers.providers.BaseProvider,
+    signer: ethers.Signer | null,
     tokenAddress: string
   ) {
     this.contract = new ethers.Contract(
@@ -46,7 +46,10 @@ export class VegaToken implements IVegaToken {
     return Number(res);
   }
 
-  async tokenData(): Promise<{ totalSupply: BigNumber; decimals: number }> {
+  async tokenData(): Promise<{
+    totalSupply: BigNumber;
+    decimals: number;
+  }> {
     const [supply, decimals] = await Promise.all([
       this.totalSupply(),
       this.decimals(),

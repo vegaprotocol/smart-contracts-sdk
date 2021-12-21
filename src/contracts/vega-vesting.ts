@@ -13,8 +13,8 @@ export class VegaVesting implements IVegaVesting {
   private decimals: number;
 
   constructor(
-    provider: ethers.providers.Web3Provider,
-    signer: ethers.Signer,
+    provider: ethers.providers.BaseProvider,
+    signer: ethers.Signer | null,
     vestingAddress: string,
     decimals: number
   ) {

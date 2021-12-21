@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 
-import { BigNumber } from 'bignumber.js';
+import BigNumber from 'bignumber.js';
 import { addDecimal } from '../utils/decimals';
 
 export function combineStakeEventsByVegaKey(
