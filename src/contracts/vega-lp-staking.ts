@@ -6,7 +6,13 @@ import lpStakeAbi from '../abis/lp_staking_abi.json';
 import { addDecimal, removeDecimal } from '../utils/decimals';
 import { IVegaLPStaking } from './interfaces';
 import { EpochDetails } from './vega-web3-types';
+import deprecated from 'deprecated-decorator';
 
+@deprecated(
+  'Vega lp staking has ended. No more rewards will be paid. Please use the Onsen menu to earn rewards on your Vega',
+  '0.0.1',
+  'https://docs.sushi.com/products/yield-farming/what-is-onsen'
+)
 export class VegaLPStaking implements IVegaLPStaking {
   private contract: ethers.Contract;
   public readonly address: string;
