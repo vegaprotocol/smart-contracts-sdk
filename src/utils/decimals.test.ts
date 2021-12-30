@@ -17,9 +17,6 @@ test('Handles large numbers correctly', () => {
     '20000000000000000000000000000000000000000000'
   );
 
-  const mangled = removeDecimal(
-    new BigNumber(addDecimal(claimCode, decimals)),
-    decimals
-  );
+  const mangled = removeDecimal(addDecimal(claimCode, decimals), decimals);
   expect(mangled.toString()).toEqual('20000000000000000000000000');
 });

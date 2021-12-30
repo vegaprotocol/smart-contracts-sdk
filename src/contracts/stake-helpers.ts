@@ -36,5 +36,5 @@ export function combineStakeEventsByVegaKey(
 
 function parseEventAmount(e: ethers.Event, decimals: number) {
   const rawAmount = new BigNumber(e.args?.amount.toString() || 0);
-  return new BigNumber(addDecimal(rawAmount, decimals));
+  return addDecimal(rawAmount, decimals);
 }

@@ -22,7 +22,7 @@ export class VegaToken {
   async allowance(address: string, spender: string): Promise<BigNumber> {
     const decimals = await this.decimals();
     const res: BigNumber = await this.contract.allowance(address, spender);
-    return new BigNumber(addDecimal(new BigNumber(res.toString()), decimals));
+    return addDecimal(new BigNumber(res.toString()), decimals);
   }
 
   async approve(spender: string): Promise<ethers.ContractTransaction> {
@@ -37,7 +37,7 @@ export class VegaToken {
   async totalSupply(): Promise<BigNumber> {
     const decimals = await this.decimals();
     const res: BigNumber = await this.contract.totalSupply();
-    return new BigNumber(addDecimal(new BigNumber(res.toString()), decimals));
+    return addDecimal(new BigNumber(res.toString()), decimals);
   }
 
   async decimals(): Promise<number> {
@@ -55,7 +55,7 @@ export class VegaToken {
     ]);
 
     return {
-      totalSupply: new BigNumber(addDecimal(supply, decimals)),
+      totalSupply: addDecimal(supply, decimals),
       decimals,
     };
   }
@@ -63,6 +63,6 @@ export class VegaToken {
   async balanceOf(address: string): Promise<BigNumber> {
     const decimals = await this.decimals();
     const res: BigNumber = await this.contract.balanceOf(address);
-    return new BigNumber(addDecimal(new BigNumber(res.toString()), decimals));
+    return addDecimal(new BigNumber(res.toString()), decimals);
   }
 }
