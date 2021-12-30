@@ -11,8 +11,9 @@ export function createUserTransactions(
 ) {
   return events.map(event => {
     return {
-      amount: new BigNumber(
-        addDecimal(new BigNumber(event.args?.amount.toString()), decimals)
+      amount: addDecimal(
+        new BigNumber(event.args?.amount.toString()),
+        decimals
       ),
       user: event.args?.user,
       tranche_id: event.args?.tranche_id,
@@ -58,11 +59,8 @@ export function getUsersInTranche(
 }
 
 export function sumFromEvents(events: ethers.Event[], decimals: number) {
-  const amounts = events.map(
-    e =>
-      new BigNumber(
-        addDecimal(new BigNumber(e.args?.amount.toString()), decimals)
-      )
+  const amounts = events.map(e =>
+    addDecimal(new BigNumber(e.args?.amount.toString()), decimals)
   );
   // Start with a 0 so if there are none there is no NaN
   return BigNumber.sum.apply(null, [new BigNumber(0), ...amounts]);
@@ -89,8 +87,9 @@ export function getLockedAmount(
 export function createTransactions(events: ethers.Event[], decimals: number) {
   return events.map(event => {
     return {
-      amount: new BigNumber(
-        addDecimal(new BigNumber(event.args?.amount.toString()), decimals)
+      amount: addDecimal(
+        new BigNumber(event.args?.amount.toString()),
+        decimals
       ),
       user: event.args?.user,
       tx: event.transactionHash,

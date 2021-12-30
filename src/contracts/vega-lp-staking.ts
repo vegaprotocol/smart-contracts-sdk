@@ -106,8 +106,9 @@ export class VegaLPStaking {
     const currentEpoch = await this.currentEpoch();
     const isPending = currentEpoch === user.last_epoch_withdrawn;
     const value = await this.contract.total_staked_for_user(account);
-    const total = new BigNumber(
-      addDecimal(new BigNumber(value.toString()), await this.lpDecimals)
+    const total = addDecimal(
+      new BigNumber(value.toString()),
+      await this.lpDecimals
     );
     return isPending
       ? {
@@ -135,8 +136,9 @@ export class VegaLPStaking {
     // being run. Just return 0 if thats the case
     try {
       const value = await this.contract.get_available_reward(account);
-      return new BigNumber(
-        addDecimal(new BigNumber(value.toString()), await this.awardDecimals)
+      return addDecimal(
+        new BigNumber(value.toString()),
+        await this.awardDecimals
       );
     } catch (e) {
       return new BigNumber(0);
@@ -156,18 +158,14 @@ export class VegaLPStaking {
   async rewardPerEpoch(): Promise<BigNumber> {
     const rewardPerEpoch: BigNumber = await this.contract.epoch_reward();
     const decimals = await this.awardDecimals;
-    return new BigNumber(
-      addDecimal(new BigNumber(rewardPerEpoch.toString()), decimals)
-    );
+    return addDecimal(new BigNumber(rewardPerEpoch.toString()), decimals);
   }
 
   async liquidityTokensInRewardPool(): Promise<BigNumber> {
     const lpContract = await this.lpContract;
     const decimals = await this.awardDecimals;
     const balance = await lpContract.balanceOf(this.address);
-    return new BigNumber(
-      addDecimal(new BigNumber(balance.toString()), decimals)
-    );
+    return addDecimal(new BigNumber(balance.toString()), decimals);
   }
 
   /**
@@ -176,18 +174,14 @@ export class VegaLPStaking {
    */
   async totalStaked(): Promise<BigNumber> {
     const value: BigNumber = await this.contract.total_staked();
-    return new BigNumber(
-      addDecimal(new BigNumber(value.toString()), await this.lpDecimals)
-    );
+    return addDecimal(new BigNumber(value.toString()), await this.lpDecimals);
   }
 
   async totalUnstaked(account: string): Promise<BigNumber> {
     const lpTokenContract = await this.lpContract;
     const lpTokenDecimals = await this.lpDecimals;
     const value = await lpTokenContract.balanceOf(account);
-    return new BigNumber(
-      addDecimal(new BigNumber(value.toString()), lpTokenDecimals)
-    );
+    return addDecimal(new BigNumber(value.toString()), lpTokenDecimals);
   }
 
   /**
@@ -230,9 +224,7 @@ export class VegaLPStaking {
       account,
       this.address
     );
-    return new BigNumber(
-      addDecimal(new BigNumber(value.toString()), await this.lpDecimals)
-    );
+    return addDecimal(new BigNumber(value.toString()), await this.lpDecimals);
   }
 
   withdrawRewards(): Promise<ethers.ContractTransaction> {

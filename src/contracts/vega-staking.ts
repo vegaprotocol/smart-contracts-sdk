@@ -67,16 +67,12 @@ export class VegaStaking {
       address,
       `0x${vegaKey}`
     );
-    return new BigNumber(
-      addDecimal(new BigNumber(res.toString()), this.decimals)
-    );
+    return addDecimal(new BigNumber(res.toString()), this.decimals);
   }
 
   async totalStaked(): Promise<BigNumber> {
     const res: BigNumber = await this.contract.total_staked();
-    return new BigNumber(
-      addDecimal(new BigNumber(res.toString()), this.decimals)
-    );
+    return addDecimal(new BigNumber(res.toString()), this.decimals);
   }
 
   async userTotalStakedByVegaKey(address: string) {

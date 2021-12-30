@@ -30,16 +30,12 @@ export class VegaVesting {
       address,
       `0x${vegaKey}`
     );
-    return new BigNumber(
-      addDecimal(new BigNumber(res.toString()), this.decimals)
-    );
+    return addDecimal(new BigNumber(res.toString()), this.decimals);
   }
 
   async totalStaked(): Promise<BigNumber> {
     const res: BigNumber = await this.contract.total_staked();
-    return new BigNumber(
-      addDecimal(new BigNumber(res.toString()), this.decimals)
-    );
+    return addDecimal(new BigNumber(res.toString()), this.decimals);
   }
 
   removeStake(
@@ -66,14 +62,12 @@ export class VegaVesting {
 
   async getLien(address: string): Promise<BigNumber> {
     const { lien } = await this.contract.user_stats(address);
-    return new BigNumber(
-      addDecimal(
-        new BigNumber(
-          // lien is a bn.js bignumber convert back to bignumber.js
-          lien.toString()
-        ),
-        this.decimals
-      )
+    return addDecimal(
+      new BigNumber(
+        // lien is a bn.js bignumber convert back to bignumber.js
+        lien.toString()
+      ),
+      this.decimals
     );
   }
 
@@ -85,9 +79,7 @@ export class VegaVesting {
       address,
       tranche
     );
-    return new BigNumber(
-      addDecimal(new BigNumber(amount.toString()), this.decimals)
-    );
+    return addDecimal(new BigNumber(amount.toString()), this.decimals);
   }
 
   async userTrancheVestedBalance(
@@ -98,18 +90,14 @@ export class VegaVesting {
       address,
       tranche
     );
-    return new BigNumber(
-      addDecimal(new BigNumber(amount.toString()), this.decimals)
-    );
+    return addDecimal(new BigNumber(amount.toString()), this.decimals);
   }
 
   async getUserBalanceAllTranches(account: string): Promise<BigNumber> {
     const amount: BigNumber = await this.contract.user_total_all_tranches(
       account
     );
-    return new BigNumber(
-      addDecimal(new BigNumber(amount.toString()), this.decimals)
-    );
+    return addDecimal(new BigNumber(amount.toString()), this.decimals);
   }
 
   async getAllTranches(): Promise<Tranche[]> {
