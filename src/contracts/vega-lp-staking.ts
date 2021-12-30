@@ -4,7 +4,6 @@ import { ethers } from 'ethers';
 import erc20Abi from '../abis/erc20_abi.json';
 import lpStakeAbi from '../abis/lp_staking_abi.json';
 import { addDecimal, removeDecimal } from '../utils/decimals';
-import { IVegaLPStaking } from './interfaces';
 import { EpochDetails } from './vega-web3-types';
 import deprecated from 'deprecated-decorator';
 
@@ -13,7 +12,7 @@ import deprecated from 'deprecated-decorator';
   '0.0.1',
   'https://docs.sushi.com/products/yield-farming/what-is-onsen'
 )
-export class VegaLPStaking implements IVegaLPStaking {
+export class VegaLPStaking {
   private contract: ethers.Contract;
   public readonly address: string;
 

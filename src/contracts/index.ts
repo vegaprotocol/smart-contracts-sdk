@@ -1,4 +1,3 @@
-export * from './interfaces';
 export * from './stake-helpers';
 export * from './tranche-helpers';
 export * from './vega-claim';

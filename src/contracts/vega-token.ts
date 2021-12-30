@@ -3,9 +3,8 @@ import { ethers } from 'ethers';
 
 import tokenAbi from '../abis/vega_token_abi.json';
 import { addDecimal, removeDecimal } from '../utils/decimals';
-import { IVegaToken } from './interfaces';
 
-export class VegaToken implements IVegaToken {
+export class VegaToken {
   private contract: ethers.Contract;
 
   constructor(
