@@ -3,12 +3,11 @@ import { ethers } from 'ethers';
 
 import vestingAbi from '../abis/vesting_abi.json';
 import { addDecimal, removeDecimal } from '../utils/decimals';
-import { IVegaVesting } from './interfaces';
 import { combineStakeEventsByVegaKey } from './stake-helpers';
 import { getTranchesFromHistory } from './tranche-helpers';
 import { Tranche } from './vega-web3-types';
 
-export class VegaVesting implements IVegaVesting {
+export class VegaVesting {
   private contract: ethers.Contract;
   private decimals: number;
 

@@ -4,7 +4,6 @@ import { ethers } from 'ethers';
 import claimAbi from '../abis/claim_abi.json';
 import { asciiToHex } from '../utils/ascii-to-hex';
 import { removeDecimal } from '../utils/decimals';
-import { IVegaClaim } from './interfaces';
 
 export const UNSPENT_CODE = '0x0000000000000000000000000000000000000000';
 export const SPENT_CODE = '0x0000000000000000000000000000000000000001';
@@ -23,7 +22,7 @@ export const SPENT_CODE = '0x0000000000000000000000000000000000000001';
  * contract.isClaimValid({ claimCode: "0x...", expiry: 0, nonce: "0x00", account: "0x00" })
  * ```
  */
-export class VegaClaim implements IVegaClaim {
+export class VegaClaim {
   private provider: ethers.providers.BaseProvider;
   private contract: ethers.Contract;
   decimals: number;

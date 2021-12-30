@@ -5,9 +5,8 @@ import stakingAbi from '../abis/staking_abi.json';
 import { combineStakeEventsByVegaKey } from './stake-helpers';
 import { addDecimal, removeDecimal } from '../utils/decimals';
 import BigNumber from 'bignumber.js';
-import { IVegaStaking } from './interfaces';
 
-export class StakingAbi implements IVegaStaking {
+export class StakingAbi {
   private contract: ethers.Contract;
   private decimals: number;
 

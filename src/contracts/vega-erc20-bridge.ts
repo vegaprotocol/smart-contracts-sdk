@@ -1,9 +1,8 @@
 import { ethers } from 'ethers';
 
 import erc20BridgeAbi from '../abis/erc20_bridge_abi.json';
-import { IVegaErc20Bridge } from './interfaces';
 
-export class VegaErc20Bridge implements IVegaErc20Bridge {
+export class VegaErc20Bridge {
   private contract: ethers.Contract;
 
   constructor(
