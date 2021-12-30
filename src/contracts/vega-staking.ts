@@ -6,7 +6,7 @@ import { combineStakeEventsByVegaKey } from './stake-helpers';
 import { addDecimal, removeDecimal } from '../utils/decimals';
 import BigNumber from 'bignumber.js';
 
-export class StakingAbi {
+export class VegaStaking {
   private contract: ethers.Contract;
   private decimals: number;
 
