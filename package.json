@@ -40,11 +40,11 @@
   "size-limit": [
     {
       "path": "dist/smart-contracts-sdk.cjs.production.min.js",
-      "limit": "10 KB"
+      "limit": "255 KB"
     },
     {
       "path": "dist/smart-contracts-sdk.esm.js",
-      "limit": "10 KB"
+      "limit": "150 KB"
     }
   ],
   "devDependencies": {
