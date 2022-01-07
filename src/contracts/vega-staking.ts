@@ -5,55 +5,53 @@ import stakingAbi from '../abis/staking_abi.json';
 import { combineStakeEventsByVegaKey } from './stake-helpers';
 import { addDecimal, removeDecimal } from '../utils/decimals';
 import BigNumber from 'bignumber.js';
+import { BaseContract } from './base-contract';
+import { EnvironmentConfig, Networks } from '..';
 
-export class VegaStaking {
-  private contract: ethers.Contract;
-  private decimals: number;
+export class VegaStaking extends BaseContract {
+  public contract: ethers.Contract;
 
-  constructor(
-    provider: ethers.providers.BaseProvider,
-    signer: ethers.Signer | null,
-    address: string,
-    decimals: number
-  ) {
+  constructor(provider: ethers.providers.Web3Provider, network: Networks) {
+    super(provider, network);
     this.contract = new ethers.Contract(
-      address,
+      EnvironmentConfig[network].stakingBridge,
       stakingAbi,
-      signer || provider
+      this.signer || this.provider
     );
-    this.decimals = decimals;
   }
 
-  addStake(
+  async addStake(
     amount: string,
     vegaKey: string
   ): Promise<ethers.ContractTransaction> {
     const convertedAmount = removeDecimal(
       new BigNumber(amount),
-      this.decimals
+      await this.dp
     ).toString();
-    return this.contract.stake(convertedAmount, `0x${vegaKey}`);
+    const tx = await this.contract.stake(convertedAmount, `0x${vegaKey}`);
+    this.trackTransaction(tx, 3);
+    return tx;
   }
 
-  removeStake(
+  async removeStake(
     amount: string,
     vegaKey: string
   ): Promise<ethers.ContractTransaction> {
     const convertedAmount = removeDecimal(
       new BigNumber(amount),
-      this.decimals
+      await this.dp
     ).toString();
     return this.contract.remove_stake(convertedAmount, `0x${vegaKey}`);
   }
 
-  transferStake(
+  async transferStake(
     amount: string,
     newAddress: string,
     vegaKey: string
   ): Promise<ethers.ContractTransaction> {
     const convertedAmount = removeDecimal(
       new BigNumber(amount),
-      this.decimals
+      await this.dp
     ).toString();
     return this.contract.transfer_stake(
       convertedAmount,
@@ -65,14 +63,14 @@ export class VegaStaking {
   async stakeBalance(address: string, vegaKey: string): Promise<BigNumber> {
     const res: BigNumber = await this.contract.stake_balance(
       address,
-      `0x${vegaKey}`
+      this.hexadecimalify(vegaKey)
     );
-    return addDecimal(new BigNumber(res.toString()), this.decimals);
+    return addDecimal(new BigNumber(res.toString()), await this.dp);
   }
 
   async totalStaked(): Promise<BigNumber> {
     const res: BigNumber = await this.contract.total_staked();
-    return addDecimal(new BigNumber(res.toString()), this.decimals);
+    return addDecimal(new BigNumber(res.toString()), await this.dp);
   }
 
   async userTotalStakedByVegaKey(address: string) {
@@ -82,8 +80,19 @@ export class VegaStaking {
     const removeEvents = await this.contract.queryFilter(removeFilter);
     const res = combineStakeEventsByVegaKey(
       [...addEvents, ...removeEvents],
-      this.decimals
+      await this.dp
     );
     return res;
+  }
+
+  bindEventListeners(events: string[], topics: Array<any>) {
+    events.forEach(event => {
+      const filter = this.contract.filters[event](...topics);
+      this.contract.on(filter, (...params) => {
+        const event = params.slice(params.length - 1)[0];
+        console.log('event recieved');
+        this.handleEvent(event);
+      });
+    });
   }
 }
