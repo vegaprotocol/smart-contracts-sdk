@@ -1,9 +1,8 @@
-import { ethers } from 'ethers';
+import { ethers, BigNumber as EthersBigNumber } from 'ethers';
 
 import stakingAbi from '../abis/staking_abi.json';
 
 import { combineStakeEventsByVegaKey } from './stake-helpers';
-import { addDecimal, removeDecimal } from '../utils/decimals';
 import BigNumber from 'bignumber.js';
 import { BaseContract } from './base-contract';
 import { EnvironmentConfig, Networks } from '..';
@@ -20,62 +19,83 @@ export class VegaStaking extends BaseContract {
     );
   }
 
+  /** Executes staking contracts stake function */
   async addStake(
-    amount: string,
+    amount: BigNumber,
     vegaKey: string
   ): Promise<ethers.ContractTransaction> {
-    const convertedAmount = removeDecimal(
-      new BigNumber(amount),
-      await this.dp
-    ).toString();
-    const tx = await this.contract.stake(convertedAmount, `0x${vegaKey}`);
+    const convertedAmount = await this.removeDecimal(amount);
+
+    const tx = await this.contract.stake(
+      convertedAmount,
+      this.hexadecimalify(vegaKey)
+    );
+
+    // store and track the transaction in BaseContract
     this.trackTransaction(tx, 3);
+
     return tx;
   }
 
+  /** Executes staking contracts remove_stake function */
   async removeStake(
-    amount: string,
+    amount: BigNumber,
     vegaKey: string
   ): Promise<ethers.ContractTransaction> {
-    const convertedAmount = removeDecimal(
-      new BigNumber(amount),
-      await this.dp
-    ).toString();
-    return this.contract.remove_stake(convertedAmount, `0x${vegaKey}`);
+    const convertedAmount = await this.removeDecimal(amount);
+
+    const tx = this.contract.remove_stake(
+      convertedAmount,
+      this.hexadecimalify(vegaKey)
+    );
+
+    this.trackTransaction(tx, 3);
+
+    return tx;
   }
 
+  /** Executes staking contracts transfer_stake function */
   async transferStake(
-    amount: string,
+    amount: BigNumber,
     newAddress: string,
     vegaKey: string
   ): Promise<ethers.ContractTransaction> {
-    const convertedAmount = removeDecimal(
-      new BigNumber(amount),
-      await this.dp
-    ).toString();
-    return this.contract.transfer_stake(
+    const convertedAmount = await this.removeDecimal(amount);
+
+    const tx = this.contract.transfer_stake(
       convertedAmount,
       newAddress,
-      `0x${vegaKey}`
+      this.hexadecimalify(vegaKey)
     );
+
+    this.trackTransaction(tx, 3);
+
+    return tx;
   }
 
+  /** Returns the amount staked for given Vega public key */
   async stakeBalance(address: string, vegaKey: string): Promise<BigNumber> {
-    const res: BigNumber = await this.contract.stake_balance(
+    const res: EthersBigNumber = await this.contract.stake_balance(
       address,
       this.hexadecimalify(vegaKey)
     );
-    return addDecimal(new BigNumber(res.toString()), await this.dp);
+    const value = await this.addDecimal(res);
+    return value;
   }
 
+  /** Returns the total amount currently staked */
   async totalStaked(): Promise<BigNumber> {
-    const res: BigNumber = await this.contract.total_staked();
-    return addDecimal(new BigNumber(res.toString()), await this.dp);
+    const res: EthersBigNumber = await this.contract.total_staked();
+    const value = await this.addDecimal(res);
+    return value;
   }
 
-  async userTotalStakedByVegaKey(address: string) {
-    const addFilter = this.contract.filters.Stake_Deposited(address);
-    const removeFilter = this.contract.filters.Stake_Removed(address);
+  /** Returns amounts staked across all Vega keys for single Ethereum account */
+  async userTotalStakedByVegaKey(
+    ethereumAccount: string
+  ): Promise<{ [vegaKey: string]: BigNumber }> {
+    const addFilter = this.contract.filters.Stake_Deposited(ethereumAccount);
+    const removeFilter = this.contract.filters.Stake_Removed(ethereumAccount);
     const addEvents = await this.contract.queryFilter(addFilter);
     const removeEvents = await this.contract.queryFilter(removeFilter);
     const res = combineStakeEventsByVegaKey(
@@ -83,16 +103,5 @@ export class VegaStaking extends BaseContract {
       await this.dp
     );
     return res;
-  }
-
-  bindEventListeners(events: string[], topics: Array<any>) {
-    events.forEach(event => {
-      const filter = this.contract.filters[event](...topics);
-      this.contract.on(filter, (...params) => {
-        const event = params.slice(params.length - 1)[0];
-        console.log('event recieved');
-        this.handleEvent(event);
-      });
-    });
   }
 }
