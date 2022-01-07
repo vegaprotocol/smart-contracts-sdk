@@ -1,105 +1,124 @@
 import BigNumber from 'bignumber.js';
-import { ethers } from 'ethers';
+import { ethers, BigNumber as EthersBigNumber } from 'ethers';
+import { EnvironmentConfig, Networks } from '..';
 
 import vestingAbi from '../abis/vesting_abi.json';
-import { addDecimal, removeDecimal } from '../utils/decimals';
+import { BaseContract } from './base-contract';
 import { combineStakeEventsByVegaKey } from './stake-helpers';
 import { getTranchesFromHistory } from './tranche-helpers';
 import { Tranche } from './vega-web3-types';
 
-export class VegaVesting {
-  private contract: ethers.Contract;
-  private decimals: number;
+export class VegaVesting extends BaseContract {
+  public contract: ethers.Contract;
 
-  constructor(
-    provider: ethers.providers.BaseProvider,
-    signer: ethers.Signer | null,
-    vestingAddress: string,
-    decimals: number
-  ) {
-    this.decimals = decimals;
+  constructor(provider: ethers.providers.Web3Provider, network: Networks) {
+    super(provider, network);
     this.contract = new ethers.Contract(
-      vestingAddress,
+      EnvironmentConfig[network].vestingAddress,
       vestingAbi,
-      signer || provider
+      this.signer || this.provider
     );
   }
 
+  /** Executes vesting contracts stake_tokens function */
+  async addStake(
+    amount: BigNumber,
+    vegaKey: string
+  ): Promise<ethers.ContractTransaction> {
+    const convertedAmount = await this.removeDecimal(amount);
+
+    const tx = await this.contract.stake_tokens(
+      convertedAmount,
+      this.hexadecimalify(vegaKey)
+    );
+
+    this.trackTransaction(tx, 3);
+
+    return tx;
+  }
+
+  /** Executes vesting contracts remove_stake function */
+  async removeStake(
+    amount: BigNumber,
+    vegaKey: string
+  ): Promise<ethers.ContractTransaction> {
+    const convertedAmount = await this.removeDecimal(amount);
+
+    const tx = await this.contract.remove_stake(
+      convertedAmount,
+      this.hexadecimalify(vegaKey)
+    );
+
+    this.trackTransaction(tx, 3);
+
+    return tx;
+  }
+
+  /** Returns the amount staked for a given Vega public key */
   async stakeBalance(address: string, vegaKey: string): Promise<BigNumber> {
-    const res: BigNumber = await this.contract.stake_balance(
+    const res: EthersBigNumber = await this.contract.stake_balance(
       address,
-      `0x${vegaKey}`
+      this.hexadecimalify(vegaKey)
     );
-    return addDecimal(new BigNumber(res.toString()), this.decimals);
+    const value = await this.addDecimal(res);
+    return value;
   }
 
+  /** Returns the total amount currently staked */
   async totalStaked(): Promise<BigNumber> {
-    const res: BigNumber = await this.contract.total_staked();
-    return addDecimal(new BigNumber(res.toString()), this.decimals);
+    const res: EthersBigNumber = await this.contract.total_staked();
+    const value = await this.addDecimal(res);
+    return value;
   }
 
-  removeStake(
-    amount: string,
-    vegaKey: string
-  ): Promise<ethers.ContractTransaction> {
-    const convertedAmount = removeDecimal(
-      new BigNumber(amount),
-      this.decimals
-    ).toString();
-    return this.contract.remove_stake(convertedAmount, `0x${vegaKey}`);
-  }
-
-  addStake(
-    amount: string,
-    vegaKey: string
-  ): Promise<ethers.ContractTransaction> {
-    const convertedAmount = removeDecimal(
-      new BigNumber(amount),
-      this.decimals
-    ).toString();
-    return this.contract.stake_tokens(convertedAmount, `0x${vegaKey}`);
-  }
-
+  /** Returns the amount of locked tokens in the vesting contract */
   async getLien(address: string): Promise<BigNumber> {
-    const { lien } = await this.contract.user_stats(address);
-    return addDecimal(
-      new BigNumber(
-        // lien is a bn.js bignumber convert back to bignumber.js
-        lien.toString()
-      ),
-      this.decimals
-    );
+    const {
+      lien,
+    }: {
+      lien: EthersBigNumber;
+      total_in_all_tranches: EthersBigNumber;
+    } = await this.contract.user_stats(address);
+    const value = await this.addDecimal(lien);
+    return value;
   }
 
+  /** Returns the amount a user has in a specific tranche */
   async userTrancheTotalBalance(
     address: string,
     tranche: number
   ): Promise<BigNumber> {
-    const amount: BigNumber = await this.contract.get_tranche_balance(
+    const amount: EthersBigNumber = await this.contract.get_tranche_balance(
       address,
       tranche
     );
-    return addDecimal(new BigNumber(amount.toString()), this.decimals);
+    const value = await this.addDecimal(amount);
+    return value;
   }
 
+  /** Returns vested amount for a given tranche */
   async userTrancheVestedBalance(
     address: string,
     tranche: number
   ): Promise<BigNumber> {
-    const amount: BigNumber = await this.contract.get_vested_for_tranche(
+    const amount: EthersBigNumber = await this.contract.get_vested_for_tranche(
       address,
       tranche
     );
-    return addDecimal(new BigNumber(amount.toString()), this.decimals);
+    const value = await this.addDecimal(amount);
+    return value;
   }
 
+  /** Returns the users total tokens across all tranches */
   async getUserBalanceAllTranches(account: string): Promise<BigNumber> {
-    const amount: BigNumber = await this.contract.user_total_all_tranches(
+    const amount: EthersBigNumber = await this.contract.user_total_all_tranches(
       account
     );
-    return addDecimal(new BigNumber(amount.toString()), this.decimals);
+    const value = await this.addDecimal(amount);
+    return value;
   }
 
+  /** Gets all tranche data */
   async getAllTranches(): Promise<Tranche[]> {
     const [created, added, removed] = await Promise.all([
       this.contract.queryFilter(this.contract.filters.Tranche_Created()),
@@ -108,13 +127,22 @@ export class VegaVesting {
         this.contract.filters.Tranche_Balance_Removed()
       ),
     ]);
-    return getTranchesFromHistory(created, added, removed, this.decimals);
+    const dp = await this.dp;
+    return getTranchesFromHistory(created, added, removed, dp);
   }
 
-  withdrawFromTranche(trancheId: number): Promise<ethers.ContractTransaction> {
-    return this.contract.withdraw_from_tranche(trancheId);
+  /** Executes contracts withdraw_from_tranche function */
+  async withdrawFromTranche(
+    trancheId: number
+  ): Promise<ethers.ContractTransaction> {
+    const tx = await this.contract.withdraw_from_tranche(trancheId);
+
+    this.trackTransaction(tx, 3);
+
+    return tx;
   }
 
+  /** Returns amounts staked across all Vega keys for single Ethereum account */
   async userTotalStakedByVegaKey(address: string) {
     const addFilter = this.contract.filters.Stake_Deposited(address);
     const removeFilter = this.contract.filters.Stake_Removed(address);
@@ -122,7 +150,7 @@ export class VegaVesting {
     const removeEvents = await this.contract.queryFilter(removeFilter);
     const res = combineStakeEventsByVegaKey(
       [...addEvents, ...removeEvents],
-      this.decimals
+      await this.dp
     );
     return res;
   }
