@@ -36,7 +36,7 @@ export class VegaToken {
   async approve(spender: string): Promise<ethers.ContractTransaction> {
     const decimals = await this.dp;
     const amount = removeDecimal(
-      new BigNumber(Number.MAX_SAFE_INTEGER),
+      new BigNumber(Number.MAX_SAFE_INTEGER - 1),
       decimals
     );
     return this.contract.approve(spender, amount);
