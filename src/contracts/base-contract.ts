@@ -1,5 +1,6 @@
-import { ethers } from 'ethers';
-import { EnvironmentConfig, Networks } from '..';
+import BigNumber from 'bignumber.js';
+import { ethers, BigNumber as EthersBigNumber } from 'ethers';
+import { addDecimal, EnvironmentConfig, Networks, removeDecimal } from '..';
 import tokenAbi from '../abis/vega_token_abi.json';
 
 interface TxData {
@@ -54,15 +55,15 @@ export class BaseContract {
     this.mergeTransaction({ tx, receipt, pending: false });
   }
 
-  private mergeTransaction(tx: TxData) {
-    this.transactions = [
-      // Replace any existing transaction in the array with this one
-      ...this.transactions.filter(t => t.tx.hash !== tx.tx.hash),
-      tx,
-    ];
+  async removeDecimal(value: BigNumber): Promise<string> {
+    return removeDecimal(value, await this.dp).toString();
   }
 
-  watchTransactions(fn: Function) {
+  async addDecimal(value: EthersBigNumber): Promise<BigNumber> {
+    return addDecimal(new BigNumber(value.toString()), await this.dp);
+  }
+
+  watchTransactions(fn: (txs: TxData[]) => void) {
     this.transactionListener = fn;
   }
 
@@ -77,5 +78,13 @@ export class BaseContract {
 
   hexadecimalify(str: string) {
     return `0x${str}`;
+  }
+
+  private mergeTransaction(tx: TxData) {
+    this.transactions = [
+      // Replace any existing transaction in the array with this one
+      ...this.transactions.filter(t => t.tx.hash !== tx.tx.hash),
+      tx,
+    ];
   }
 }
