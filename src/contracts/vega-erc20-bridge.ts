@@ -1,39 +1,39 @@
 import { ethers } from 'ethers';
+import { EnvironmentConfig, Networks } from '..';
 
 import erc20BridgeAbi from '../abis/erc20_bridge_abi.json';
+import { BaseContract } from './base-contract';
 
-export class VegaErc20Bridge {
+export class VegaErc20Bridge extends BaseContract {
   private contract: ethers.Contract;
 
-  constructor(
-    provider: ethers.providers.BaseProvider,
-    signer: ethers.Signer | null,
-    address: string
-  ) {
-    if (!ethers.utils.isAddress(address)) {
-      throw new Error(`Invalid Ethereum address for Vega ERC20 bridge`);
-    }
-
+  constructor(provider: ethers.providers.Web3Provider, network: Networks) {
+    super(provider, network);
     this.contract = new ethers.Contract(
-      address,
+      EnvironmentConfig[network].erc20Bridge,
       erc20BridgeAbi,
-      signer || provider
+      this.signer || this.provider
     );
   }
 
-  withdraw(approval: {
+  /** Executes contracts withdraw_asset function */
+  async withdraw(approval: {
     assetSource: string;
     amount: string;
     nonce: string;
     signatures: string;
     targetAddress: string;
   }): Promise<ethers.ContractTransaction> {
-    return this.contract.withdraw_asset(
+    const tx = await this.contract.withdraw_asset(
       approval.assetSource,
       approval.amount, // No need to remove decimals as this value is already set and not manipulated by the user
       approval.targetAddress,
       approval.nonce,
       approval.signatures
     );
+
+    this.trackTransaction(tx, 3);
+
+    return tx;
   }
 }
