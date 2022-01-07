@@ -44,7 +44,7 @@ export class VegaStaking extends BaseContract {
   ): Promise<ethers.ContractTransaction> {
     const convertedAmount = await this.removeDecimal(amount);
 
-    const tx = this.contract.remove_stake(
+    const tx = await this.contract.remove_stake(
       convertedAmount,
       this.hexadecimalify(vegaKey)
     );
@@ -62,7 +62,7 @@ export class VegaStaking extends BaseContract {
   ): Promise<ethers.ContractTransaction> {
     const convertedAmount = await this.removeDecimal(amount);
 
-    const tx = this.contract.transfer_stake(
+    const tx = await this.contract.transfer_stake(
       convertedAmount,
       newAddress,
       this.hexadecimalify(vegaKey)
