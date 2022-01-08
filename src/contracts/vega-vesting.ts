@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { ethers, BigNumber as EthersBigNumber } from 'ethers';
-import { EnvironmentConfig, Networks } from '..';
-
+import { EnvironmentConfig } from '../config/ethereum';
+import { Networks } from '../config/vega';
 import vestingAbi from '../abis/vesting_abi.json';
 import { BaseContract } from './base-contract';
 import { combineStakeEventsByVegaKey } from './stake-helpers';

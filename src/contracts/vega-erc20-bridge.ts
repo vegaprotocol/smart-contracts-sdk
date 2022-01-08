@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
-import { EnvironmentConfig, Networks } from '..';
+import { EnvironmentConfig } from '../config/ethereum';
+import { Networks } from '../config/vega';
 
 import erc20BridgeAbi from '../abis/erc20_bridge_abi.json';
 import { BaseContract } from './base-contract';
