@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { ethers, BigNumber as EthersBigNumber } from 'ethers';
-import { EnvironmentConfig, Networks } from '..';
-
+import { EnvironmentConfig } from '../config/ethereum';
+import { Networks } from '../config/vega';
 import tokenAbi from '../abis/vega_token_abi.json';
 import { BaseContract } from './base-contract';
 

@@ -1,11 +1,10 @@
 import { ethers, BigNumber as EthersBigNumber } from 'ethers';
-
 import stakingAbi from '../abis/staking_abi.json';
-
 import { combineStakeEventsByVegaKey } from './stake-helpers';
 import BigNumber from 'bignumber.js';
 import { BaseContract } from './base-contract';
-import { EnvironmentConfig, Networks } from '..';
+import { EnvironmentConfig } from '../config/ethereum';
+import { Networks } from '../config/vega';
 
 export class VegaStaking extends BaseContract {
   public contract: ethers.Contract;

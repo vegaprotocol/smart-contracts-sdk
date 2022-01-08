@@ -73,9 +73,3 @@ export interface EpochDetails {
   startSeconds: BigNumber;
   endSeconds: BigNumber;
 }
-
-export interface TxError {
-  message: string;
-  code: number;
-  data?: unknown;
-}

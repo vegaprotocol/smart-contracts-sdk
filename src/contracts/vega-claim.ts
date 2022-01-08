@@ -1,9 +1,10 @@
 import BigNumber from 'bignumber.js';
 import { ethers } from 'ethers';
-
+import { EnvironmentConfig } from '../config/ethereum';
+import { Networks } from '../config/vega';
 import claimAbi from '../abis/claim_abi.json';
-import { asciiToHex } from '../utils/ascii-to-hex';
-import { removeDecimal } from '../utils/decimals';
+import { asciiToHex } from '../utils';
+import { BaseContract } from './base-contract';
 
 export const UNSPENT_CODE = '0x0000000000000000000000000000000000000000';
 export const SPENT_CODE = '0x0000000000000000000000000000000000000001';
@@ -22,27 +23,26 @@ export const SPENT_CODE = '0x0000000000000000000000000000000000000001';
  * contract.isClaimValid({ claimCode: "0x...", expiry: 0, nonce: "0x00", account: "0x00" })
  * ```
  */
-export class VegaClaim {
-  private provider: ethers.providers.BaseProvider;
-  private contract: ethers.Contract;
-  decimals: number;
+export class VegaClaim extends BaseContract {
+  public contract: ethers.Contract;
 
-  constructor(
-    provider: ethers.providers.BaseProvider,
-    signer: ethers.Signer | null,
-    claimAddress: string,
-    decimals: number
-  ) {
+  constructor(provider: ethers.providers.Web3Provider, network: Networks) {
+    super(provider, network);
     this.provider = provider;
     this.contract = new ethers.Contract(
-      claimAddress,
+      EnvironmentConfig[network].claimAddress,
       claimAbi,
-      signer || provider
+      this.signer || this.provider
     );
-    this.decimals = decimals;
   }
-  commit(s: string): Promise<ethers.ContractTransaction> {
-    return this.contract.commit_untargeted(s);
+
+  /** Execute contracts commit_untargeted function */
+  async commit(s: string): Promise<ethers.ContractTransaction> {
+    const tx = await this.contract.commit_untargeted(s);
+
+    this.trackTransaction(tx, 3);
+
+    return tx;
   }
 
   /**
@@ -51,7 +51,7 @@ export class VegaClaim {
    * was performed and mined beforehand
    * @return {Promise<boolean>}
    */
-  public claim({
+  public async claim({
     amount,
     tranche,
     expiry,
@@ -70,13 +70,14 @@ export class VegaClaim {
     r: string;
     s: string;
   }): Promise<ethers.ContractTransaction> {
-    return this.contract[
+    const convertedAmount = await this.removeDecimal(amount);
+    const tx = await this.contract[
       target != null ? 'claim_targeted' : 'claim_untargeted'
     ](
       ...[
         { r, s, v },
         {
-          amount: removeDecimal(amount, this.decimals),
+          amount: convertedAmount,
           tranche,
           expiry,
         },
@@ -84,6 +85,10 @@ export class VegaClaim {
         target,
       ].filter(Boolean)
     );
+
+    this.trackTransaction(tx, 3);
+
+    return tx;
   }
 
   /**

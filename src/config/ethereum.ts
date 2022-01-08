@@ -7,39 +7,6 @@ const customVestingAddress = process.env.CUSTOM_VESTING_ADDRESS as string;
 const customStakingBridge = process.env.CUSTOM_STAKING_BRIDGE as string;
 const customErc20Bridge = process.env.CUSTOM_ERC20_BRIDGE as string;
 
-export type EthereumChainId = '0x1' | '0x3' | '0x4' | '0x5' | '0x2a';
-
-export type EthereumChainName =
-  | 'Mainnet'
-  | 'Ropsten'
-  | 'Rinkeby'
-  | 'Goerli'
-  | 'Kovan';
-
-export const EthereumChainNames: Record<EthereumChainId, EthereumChainName> = {
-  '0x1': 'Mainnet',
-  '0x3': 'Ropsten',
-  '0x4': 'Rinkeby',
-  '0x5': 'Goerli',
-  '0x2a': 'Kovan',
-};
-
-export const EthereumChainIds: Record<EthereumChainName, EthereumChainId> = {
-  Mainnet: '0x1',
-  Ropsten: '0x3',
-  Rinkeby: '0x4',
-  Goerli: '0x5',
-  Kovan: '0x2a',
-};
-
-export const ChainIdMap: Record<EthereumChainId, number> = {
-  '0x1': 1,
-  '0x3': 3,
-  '0x4': 4,
-  '0x5': 5,
-  '0x2a': 42,
-};
-
 interface VegaContracts {
   vestingAddress: string;
   vegaTokenAddress: string;

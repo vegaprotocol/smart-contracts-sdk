@@ -1,6 +1,8 @@
 import BigNumber from 'bignumber.js';
 import { ethers, BigNumber as EthersBigNumber } from 'ethers';
-import { addDecimal, EnvironmentConfig, Networks, removeDecimal } from '..';
+import { EnvironmentConfig } from '../config/ethereum';
+import { Networks } from '../config/vega';
+import { addDecimal, removeDecimal } from '../utils';
 import tokenAbi from '../abis/vega_token_abi.json';
 
 interface TxData {
