@@ -29,7 +29,7 @@ export class VegaToken {
 
   async allowance(address: string, spender: string): Promise<BigNumber> {
     const decimals = await this.dp;
-    const res: BigNumber = await this.contract.allowance(address, spender);
+    const res = await this.contract.allowance(address, spender);
     return addDecimal(new BigNumber(res.toString()), decimals);
   }
 
@@ -39,7 +39,7 @@ export class VegaToken {
       new BigNumber(Number.MAX_SAFE_INTEGER - 1),
       decimals
     );
-    return this.contract.approve(spender, amount);
+    return this.contract.approve(spender, amount.toString());
   }
 
   async totalSupply(): Promise<BigNumber> {
