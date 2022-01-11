@@ -17,7 +17,7 @@ export class VegaToken extends BaseContract {
     this.contract = new ethers.Contract(
       EnvironmentConfig[network].vegaTokenAddress,
       tokenAbi,
-      this.provider
+      this.signer || this.provider
     );
   }
 

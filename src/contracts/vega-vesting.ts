@@ -21,7 +21,7 @@ export class VegaVesting extends BaseContract {
     this.contract = new ethers.Contract(
       EnvironmentConfig[network].vestingAddress,
       vestingAbi,
-      this.provider
+      this.signer || this.provider
     );
   }
 

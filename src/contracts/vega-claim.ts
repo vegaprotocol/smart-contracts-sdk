@@ -35,7 +35,7 @@ export class VegaClaim extends BaseContract {
     this.contract = new ethers.Contract(
       EnvironmentConfig[network].claimAddress,
       claimAbi,
-      this.provider
+      this.signer || this.provider
     );
   }
 
