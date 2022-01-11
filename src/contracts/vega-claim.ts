@@ -28,11 +28,10 @@ export class VegaClaim extends BaseContract {
 
   constructor(provider: ethers.providers.Web3Provider, network: Networks) {
     super(provider, network);
-    this.provider = provider;
     this.contract = new ethers.Contract(
       EnvironmentConfig[network].claimAddress,
       claimAbi,
-      this.signer || this.provider
+      this.provider
     );
   }
 

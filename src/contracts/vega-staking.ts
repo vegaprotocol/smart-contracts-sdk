@@ -15,7 +15,7 @@ export class VegaStaking extends BaseContract {
     this.contract = new ethers.Contract(
       EnvironmentConfig[network].stakingBridge,
       stakingAbi,
-      this.signer || this.provider
+      this.provider
     );
   }
 
