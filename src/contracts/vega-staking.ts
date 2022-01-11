@@ -26,7 +26,8 @@ export class VegaStaking extends BaseContract {
   /** Executes staking contracts stake function */
   async addStake(
     amount: BigNumber,
-    vegaKey: string
+    vegaKey: string,
+    confirmations: number = 1
   ): Promise<ethers.ContractTransaction> {
     const convertedAmount = await this.removeDecimal(amount);
 
@@ -36,7 +37,7 @@ export class VegaStaking extends BaseContract {
     );
 
     // store and track the transaction in BaseContract
-    this.trackTransaction(tx, 3);
+    this.trackTransaction(tx, confirmations);
 
     return tx;
   }
@@ -44,7 +45,8 @@ export class VegaStaking extends BaseContract {
   /** Executes staking contracts remove_stake function */
   async removeStake(
     amount: BigNumber,
-    vegaKey: string
+    vegaKey: string,
+    confirmations: number = 1
   ): Promise<ethers.ContractTransaction> {
     const convertedAmount = await this.removeDecimal(amount);
 
@@ -53,7 +55,7 @@ export class VegaStaking extends BaseContract {
       hexadecimalify(vegaKey)
     );
 
-    this.trackTransaction(tx, 3);
+    this.trackTransaction(tx, confirmations);
 
     return tx;
   }
@@ -62,7 +64,8 @@ export class VegaStaking extends BaseContract {
   async transferStake(
     amount: BigNumber,
     newAddress: string,
-    vegaKey: string
+    vegaKey: string,
+    confirmations: number = 1
   ): Promise<ethers.ContractTransaction> {
     const convertedAmount = await this.removeDecimal(amount);
 
@@ -72,7 +75,7 @@ export class VegaStaking extends BaseContract {
       hexadecimalify(vegaKey)
     );
 
-    this.trackTransaction(tx, 3);
+    this.trackTransaction(tx, confirmations);
 
     return tx;
   }

@@ -38,7 +38,7 @@ export class BaseContract {
     })();
   }
 
-  async handleEvent(event: ethers.Event, confirmations = 1) {
+  async handleEvent(event: ethers.Event, confirmations: number = 1) {
     const tx = await event.getTransaction();
     // start tracking transaction if its not already in the transactions array
     const existing = this.transactions.find(t => t.tx.hash === tx.hash);
@@ -49,7 +49,7 @@ export class BaseContract {
 
   async trackTransaction(
     tx: ethers.providers.TransactionResponse,
-    confirmations: number
+    confirmations: number = 1
   ) {
     this.mergeTransaction({ tx, receipt: null, pending: true });
 

@@ -32,11 +32,14 @@ export class VegaToken extends BaseContract {
   }
 
   /** Executs contracts approve function */
-  async approve(spender: string): Promise<ethers.ContractTransaction> {
+  async approve(
+    spender: string,
+    confirmations: number = 1
+  ): Promise<ethers.ContractTransaction> {
     const amount = this.removeDecimal(new BigNumber(Number.MAX_SAFE_INTEGER));
     const tx = await this.contract.approve(spender, amount);
 
-    this.trackTransaction(tx, 3);
+    this.trackTransaction(tx, confirmations);
 
     return tx;
   }

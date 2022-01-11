@@ -40,10 +40,13 @@ export class VegaClaim extends BaseContract {
   }
 
   /** Execute contracts commit_untargeted function */
-  async commit(s: string): Promise<ethers.ContractTransaction> {
+  async commit(
+    s: string,
+    confirmations: number = 1
+  ): Promise<ethers.ContractTransaction> {
     const tx = await this.contract.commit_untargeted(s);
 
-    this.trackTransaction(tx, 3);
+    this.trackTransaction(tx, confirmations);
 
     return tx;
   }
@@ -54,25 +57,28 @@ export class VegaClaim extends BaseContract {
    * was performed and mined beforehand
    * @return {Promise<boolean>}
    */
-  public async claim({
-    amount,
-    tranche,
-    expiry,
-    target,
-    country,
-    v,
-    r,
-    s,
-  }: {
-    amount: BigNumber;
-    tranche: number;
-    expiry: number;
-    target?: string;
-    country: string;
-    v: number;
-    r: string;
-    s: string;
-  }): Promise<ethers.ContractTransaction> {
+  public async claim(
+    {
+      amount,
+      tranche,
+      expiry,
+      target,
+      country,
+      v,
+      r,
+      s,
+    }: {
+      amount: BigNumber;
+      tranche: number;
+      expiry: number;
+      target?: string;
+      country: string;
+      v: number;
+      r: string;
+      s: string;
+    },
+    confirmations: number = 1
+  ): Promise<ethers.ContractTransaction> {
     const convertedAmount = await this.removeDecimal(amount);
     const tx = await this.contract[
       target != null ? 'claim_targeted' : 'claim_untargeted'
@@ -89,7 +95,7 @@ export class VegaClaim extends BaseContract {
       ].filter(Boolean)
     );
 
-    this.trackTransaction(tx, 3);
+    this.trackTransaction(tx, confirmations);
 
     return tx;
   }

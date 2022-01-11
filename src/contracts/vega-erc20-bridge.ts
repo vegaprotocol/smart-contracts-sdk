@@ -22,13 +22,16 @@ export class VegaErc20Bridge extends BaseContract {
   }
 
   /** Executes contracts withdraw_asset function */
-  async withdraw(approval: {
-    assetSource: string;
-    amount: string;
-    nonce: string;
-    signatures: string;
-    targetAddress: string;
-  }): Promise<ethers.ContractTransaction> {
+  async withdraw(
+    approval: {
+      assetSource: string;
+      amount: string;
+      nonce: string;
+      signatures: string;
+      targetAddress: string;
+    },
+    confirmations: number = 1
+  ): Promise<ethers.ContractTransaction> {
     const tx = await this.contract.withdraw_asset(
       approval.assetSource,
       approval.amount, // No need to remove decimals as this value is already set and not manipulated by the user
@@ -37,7 +40,7 @@ export class VegaErc20Bridge extends BaseContract {
       approval.signatures
     );
 
-    this.trackTransaction(tx, 3);
+    this.trackTransaction(tx, confirmations);
 
     return tx;
   }
