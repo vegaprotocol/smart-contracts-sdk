@@ -15,8 +15,8 @@ export class BaseContract {
   public provider: ethers.providers.Provider | ethers.Signer;
   public tokenContract: ethers.Contract;
   public dp: Promise<number>;
-  public _transactions: TxData[] = [];
-  public transactionListener: Function = () => {};
+  public transactions: TxData[] = [];
+  public listeners: Function[] = [];
 
   constructor(
     provider: ethers.providers.Provider | ethers.Signer,
@@ -49,7 +49,9 @@ export class BaseContract {
     confirmations: number
   ) {
     this.mergeTransaction({ tx, receipt: null, pending: true });
+
     let receipt = null;
+
     for (let i = 1; i <= confirmations; i++) {
       receipt = await tx.wait(i);
       this.mergeTransaction({ tx, receipt, pending: true });
@@ -66,24 +68,22 @@ export class BaseContract {
     return addDecimal(new BigNumber(value.toString()), await this.dp);
   }
 
-  watchTransactions(fn: (txs: TxData[]) => void) {
-    this.transactionListener = fn;
-  }
-
-  get transactions() {
-    return this._transactions;
-  }
-
-  set transactions(txs) {
-    this._transactions = txs;
-    this.transactionListener(txs);
-  }
-
   private mergeTransaction(tx: TxData) {
     this.transactions = [
       // Replace any existing transaction in the array with this one
       ...this.transactions.filter(t => t.tx.hash !== tx.tx.hash),
       tx,
     ];
+    this.emit();
+  }
+
+  emit() {
+    this.listeners.forEach(ln => {
+      ln(this.transactions);
+    });
+  }
+
+  listen(cb: Function) {
+    this.listeners.push(cb);
   }
 }
