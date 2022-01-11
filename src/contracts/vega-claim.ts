@@ -104,6 +104,8 @@ export class VegaClaim extends BaseContract {
    * @returns Promise<boolean>
    */
   async isExpired(expiry: number): Promise<boolean> {
+    // TODO: Check this works
+    // @ts-ignore
     return expiry < (await this.provider.getBlock('latest')).timestamp;
   }
 
