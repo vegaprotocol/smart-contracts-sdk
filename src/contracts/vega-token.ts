@@ -8,8 +8,12 @@ import { BaseContract } from './base-contract';
 export class VegaToken extends BaseContract {
   public contract: ethers.Contract;
 
-  constructor(provider: ethers.providers.Web3Provider, network: Networks) {
-    super(provider, network);
+  constructor(
+    network: Networks,
+    provider: ethers.providers.Web3Provider,
+    signer?: ethers.Signer
+  ) {
+    super(network, provider, signer);
     this.contract = new ethers.Contract(
       EnvironmentConfig[network].vegaTokenAddress,
       tokenAbi,

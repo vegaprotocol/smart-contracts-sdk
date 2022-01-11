@@ -26,8 +26,12 @@ export const SPENT_CODE = '0x0000000000000000000000000000000000000001';
 export class VegaClaim extends BaseContract {
   public contract: ethers.Contract;
 
-  constructor(provider: ethers.providers.Web3Provider, network: Networks) {
-    super(provider, network);
+  constructor(
+    network: Networks,
+    provider: ethers.providers.Web3Provider,
+    signer?: ethers.Signer
+  ) {
+    super(network, provider, signer);
     this.contract = new ethers.Contract(
       EnvironmentConfig[network].claimAddress,
       claimAbi,
@@ -104,8 +108,6 @@ export class VegaClaim extends BaseContract {
    * @returns Promise<boolean>
    */
   async isExpired(expiry: number): Promise<boolean> {
-    // TODO: Check this works
-    // @ts-ignore
     return expiry < (await this.provider.getBlock('latest')).timestamp;
   }
 
