@@ -13,7 +13,7 @@ export class VegaErc20Bridge extends BaseContract {
     this.contract = new ethers.Contract(
       EnvironmentConfig[network].erc20Bridge,
       erc20BridgeAbi,
-      this.signer || this.provider
+      this.provider
     );
   }
 

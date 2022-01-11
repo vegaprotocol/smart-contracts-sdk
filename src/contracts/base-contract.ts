@@ -12,17 +12,18 @@ interface TxData {
 }
 
 export class BaseContract {
-  public provider: ethers.providers.Provider;
-  public signer: ethers.Signer | null;
+  public provider: ethers.providers.Provider | ethers.Signer;
   public tokenContract: ethers.Contract;
   public dp: Promise<number>;
   public _transactions: TxData[] = [];
   public transactionListener: Function = () => {};
 
-  constructor(provider: ethers.providers.Web3Provider, network: Networks) {
+  constructor(
+    provider: ethers.providers.Provider | ethers.Signer,
+    network: Networks
+  ) {
     const self = this;
     this.provider = provider;
-    this.signer = provider.getSigner() || null;
     this.tokenContract = new ethers.Contract(
       EnvironmentConfig[network].vegaTokenAddress,
       tokenAbi,
