@@ -78,10 +78,6 @@ export class BaseContract {
     this.transactionListener(txs);
   }
 
-  hexadecimalify(str: string) {
-    return `0x${str}`;
-  }
-
   private mergeTransaction(tx: TxData) {
     this.transactions = [
       // Replace any existing transaction in the array with this one

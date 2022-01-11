@@ -7,6 +7,7 @@ import { BaseContract } from './base-contract';
 import { combineStakeEventsByVegaKey } from './stake-helpers';
 import { getTranchesFromHistory } from './tranche-helpers';
 import { Tranche } from './vega-web3-types';
+import { hexadecimalify } from '../utils';
 
 export class VegaVesting extends BaseContract {
   public contract: ethers.Contract;
@@ -29,7 +30,7 @@ export class VegaVesting extends BaseContract {
 
     const tx = await this.contract.stake_tokens(
       convertedAmount,
-      this.hexadecimalify(vegaKey)
+      hexadecimalify(vegaKey)
     );
 
     this.trackTransaction(tx, 3);
@@ -46,7 +47,7 @@ export class VegaVesting extends BaseContract {
 
     const tx = await this.contract.remove_stake(
       convertedAmount,
-      this.hexadecimalify(vegaKey)
+      hexadecimalify(vegaKey)
     );
 
     this.trackTransaction(tx, 3);
@@ -58,7 +59,7 @@ export class VegaVesting extends BaseContract {
   async stakeBalance(address: string, vegaKey: string): Promise<BigNumber> {
     const res: EthersBigNumber = await this.contract.stake_balance(
       address,
-      this.hexadecimalify(vegaKey)
+      hexadecimalify(vegaKey)
     );
     const value = await this.addDecimal(res);
     return value;

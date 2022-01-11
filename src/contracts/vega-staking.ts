@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js';
 import { BaseContract } from './base-contract';
 import { EnvironmentConfig } from '../config/ethereum';
 import { Networks } from '../config/vega';
+import { hexadecimalify } from '../utils';
 
 export class VegaStaking extends BaseContract {
   public contract: ethers.Contract;
@@ -27,7 +28,7 @@ export class VegaStaking extends BaseContract {
 
     const tx = await this.contract.stake(
       convertedAmount,
-      this.hexadecimalify(vegaKey)
+      hexadecimalify(vegaKey)
     );
 
     // store and track the transaction in BaseContract
@@ -45,7 +46,7 @@ export class VegaStaking extends BaseContract {
 
     const tx = await this.contract.remove_stake(
       convertedAmount,
-      this.hexadecimalify(vegaKey)
+      hexadecimalify(vegaKey)
     );
 
     this.trackTransaction(tx, 3);
@@ -64,7 +65,7 @@ export class VegaStaking extends BaseContract {
     const tx = await this.contract.transfer_stake(
       convertedAmount,
       newAddress,
-      this.hexadecimalify(vegaKey)
+      hexadecimalify(vegaKey)
     );
 
     this.trackTransaction(tx, 3);
@@ -76,7 +77,7 @@ export class VegaStaking extends BaseContract {
   async stakeBalance(address: string, vegaKey: string): Promise<BigNumber> {
     const res: EthersBigNumber = await this.contract.stake_balance(
       address,
-      this.hexadecimalify(vegaKey)
+      hexadecimalify(vegaKey)
     );
     const value = await this.addDecimal(res);
     return value;
