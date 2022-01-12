@@ -7,15 +7,6 @@ const customVestingAddress = process.env.CUSTOM_VESTING_ADDRESS as string;
 const customStakingBridge = process.env.CUSTOM_STAKING_BRIDGE as string;
 const customErc20Bridge = process.env.CUSTOM_ERC20_BRIDGE as string;
 
-interface VegaContracts {
-  vestingAddress: string;
-  vegaTokenAddress: string;
-  claimAddress: string;
-  lockedAddress: string;
-  stakingBridge: string;
-  erc20Bridge: string;
-}
-
 export type EthereumChainId = '0x1' | '0x3' | '0x4' | '0x5' | '0x2a';
 
 export type EthereumChainName =
@@ -40,6 +31,22 @@ export const EthereumChainIds: Record<EthereumChainName, EthereumChainId> = {
   Goerli: '0x5',
   Kovan: '0x2a',
 };
+
+export const ChainIdMap: Record<EthereumChainId, number> = {
+  '0x1': 1,
+  '0x3': 3,
+  '0x4': 4,
+  '0x5': 5,
+  '0x2a': 42,
+};
+interface VegaContracts {
+  vestingAddress: string;
+  vegaTokenAddress: string;
+  claimAddress: string;
+  lockedAddress: string;
+  stakingBridge: string;
+  erc20Bridge: string;
+}
 
 export const EnvironmentConfig: { [key in Networks]: VegaContracts } = {
   [Networks.CUSTOM]: {
