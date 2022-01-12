@@ -4,12 +4,7 @@ import { EnvironmentConfig } from '../config/ethereum';
 import { Networks } from '../config/vega';
 import { addDecimal, removeDecimal } from '../utils';
 import tokenAbi from '../abis/vega_token_abi.json';
-
-interface TxData {
-  tx: ethers.ContractTransaction;
-  receipt: ethers.ContractReceipt | null;
-  pending: boolean;
-}
+import { TxData } from '.';
 
 export class BaseContract {
   public signer: ethers.Signer | null = null;
@@ -38,29 +33,44 @@ export class BaseContract {
     })();
   }
 
-  async handleEvent(event: ethers.Event, confirmations: number = 1) {
+  async handleEvent(event: ethers.Event, requiredConfirmations: number = 1) {
     const tx = await event.getTransaction();
     // start tracking transaction if its not already in the transactions array
     const existing = this.transactions.find(t => t.tx.hash === tx.hash);
     if (!existing) {
-      this.trackTransaction(tx, confirmations);
+      this.trackTransaction(tx, requiredConfirmations);
     }
   }
 
   async trackTransaction(
     tx: ethers.providers.TransactionResponse,
-    confirmations: number = 1
+    requiredConfirmations: number = 1
   ) {
-    this.mergeTransaction({ tx, receipt: null, pending: true });
+    this.mergeTransaction({
+      tx,
+      receipt: null,
+      pending: true,
+      requiredConfirmations,
+    });
 
     let receipt = null;
 
-    for (let i = 1; i <= confirmations; i++) {
+    for (let i = 1; i <= requiredConfirmations; i++) {
       receipt = await tx.wait(i);
-      this.mergeTransaction({ tx, receipt, pending: true });
+      this.mergeTransaction({
+        tx,
+        receipt,
+        pending: true,
+        requiredConfirmations,
+      });
     }
 
-    this.mergeTransaction({ tx, receipt, pending: false });
+    this.mergeTransaction({
+      tx,
+      receipt,
+      pending: false,
+      requiredConfirmations,
+    });
   }
 
   async removeDecimal(value: BigNumber): Promise<string> {
@@ -86,7 +96,7 @@ export class BaseContract {
     });
   }
 
-  listen(cb: Function) {
+  listen(cb: (txs: TxData[]) => void) {
     this.listeners.push(cb);
   }
 }
