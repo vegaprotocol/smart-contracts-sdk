@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
 
 export interface Tranche {
@@ -72,4 +73,11 @@ export interface EpochDetails {
   id: string;
   startSeconds: BigNumber;
   endSeconds: BigNumber;
+}
+
+export interface TxData {
+  tx: ethers.ContractTransaction;
+  receipt: ethers.ContractReceipt | null;
+  pending: boolean;
+  requiredConfirmations: number;
 }

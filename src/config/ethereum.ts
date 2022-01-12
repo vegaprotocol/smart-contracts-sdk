@@ -16,6 +16,31 @@ interface VegaContracts {
   erc20Bridge: string;
 }
 
+export type EthereumChainId = '0x1' | '0x3' | '0x4' | '0x5' | '0x2a';
+
+export type EthereumChainName =
+  | 'Mainnet'
+  | 'Ropsten'
+  | 'Rinkeby'
+  | 'Goerli'
+  | 'Kovan';
+
+export const EthereumChainNames: Record<EthereumChainId, EthereumChainName> = {
+  '0x1': 'Mainnet',
+  '0x3': 'Ropsten',
+  '0x4': 'Rinkeby',
+  '0x5': 'Goerli',
+  '0x2a': 'Kovan',
+};
+
+export const EthereumChainIds: Record<EthereumChainName, EthereumChainId> = {
+  Mainnet: '0x1',
+  Ropsten: '0x3',
+  Rinkeby: '0x4',
+  Goerli: '0x5',
+  Kovan: '0x2a',
+};
+
 export const EnvironmentConfig: { [key in Networks]: VegaContracts } = {
   [Networks.CUSTOM]: {
     vegaTokenAddress: customVegaTokenAddress,
@@ -65,4 +90,30 @@ export const EnvironmentConfig: { [key in Networks]: VegaContracts } = {
     stakingBridge: '0x195064D33f09e0c42cF98E665D9506e0dC17de68',
     erc20Bridge: '0xCd403f722b76366f7d609842C589906ca051310f',
   },
+};
+
+// No concept of dev/staging/test for these right now.
+export const RewardsAddresses = {
+  [EthereumChainIds.Mainnet]: {
+    'SushiSwap VEGA/ETH': '0x285de24077440c53b1661287D170e3ae22de0a44',
+    'SushiSwap VEGA/USDC': '0x49407c243c26f109b3c77c41dd83742164c20b5f',
+  } as { [key: string]: string },
+  [EthereumChainIds.Ropsten]: {
+    'SushiSwap VEGA/ETH': '0xa93dd6912897c5fe8503a82234d829bc7905714b',
+    'SushiSwap VEGA/USDC': '0xa93dd6912897c5fe8503a82234d829bc7905714b',
+  } as { [key: string]: string },
+};
+
+export const RewardsPoolAddresses = {
+  [EthereumChainIds.Mainnet]: {
+    '0x285de24077440c53b1661287D170e3ae22de0a44':
+      '0x29c827ce49accf68a1a278c67c9d30c52fbbc348',
+    '0x49407c243c26f109b3c77c41dd83742164c20b5f':
+      '0x42b7B8f8F83fA5cbf0176f8c24Ad51EbcD4B5F17',
+  } as { [key: string]: string },
+  [EthereumChainIds.Ropsten]: {
+    // Only one deployed to this environment
+    '0xa93dd6912897c5fe8503a82234d829bc7905714b':
+      '0x29c827ce49accf68a1a278c67c9d30c52fbbc348',
+  } as { [key: string]: string },
 };
