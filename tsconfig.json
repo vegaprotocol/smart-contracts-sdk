@@ -34,8 +34,6 @@
     // Allow importing of json ABI files
     "resolveJsonModule": true,
     // Allow experimental decorators so that the deprecated decorator works
-    "experimentalDecorators": true,
-    // Allow using getters and setters (and probably other features)
-    "target": "ES2015"
+    "experimentalDecorators": true
   }
 }
