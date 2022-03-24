@@ -4,6 +4,6 @@ export * from './vega-claim';
 export * from './vega-erc20-bridge';
 export * from './vega-lp-staking';
 export * from './vega-staking';
-export * from './vega-token';
 export * from './vega-vesting';
 export * from './vega-web3-types';
+export * from './erc20-token';

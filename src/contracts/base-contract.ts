@@ -1,36 +1,15 @@
-import BigNumber from 'bignumber.js';
-import { ethers, BigNumber as EthersBigNumber } from 'ethers';
-import { EnvironmentConfig } from '../config/ethereum';
-import { Networks } from '../config/vega';
-import { addDecimal, removeDecimal } from '../utils';
-import tokenAbi from '../abis/vega_token_abi.json';
+import { ethers } from 'ethers';
 import { TxData } from '.';
 
 export class BaseContract {
   public signer: ethers.Signer | null = null;
   public provider: ethers.providers.Provider;
-  public tokenContract: ethers.Contract;
-  public dp: Promise<number>;
   public transactions: TxData[] = [];
   public listeners: Function[] = [];
 
-  constructor(
-    network: Networks,
-    provider: ethers.providers.Provider,
-    signer?: ethers.Signer
-  ) {
-    const self = this;
+  constructor(provider: ethers.providers.Provider, signer?: ethers.Signer) {
     this.provider = provider;
     this.signer = signer || null;
-    this.tokenContract = new ethers.Contract(
-      EnvironmentConfig[network].vegaTokenAddress,
-      tokenAbi,
-      provider
-    );
-    this.dp = (async () => {
-      const val = await self.tokenContract.decimals();
-      return Number(val);
-    })();
   }
 
   async handleEvent(event: ethers.Event, requiredConfirmations: number = 1) {
@@ -71,14 +50,6 @@ export class BaseContract {
       pending: false,
       requiredConfirmations,
     });
-  }
-
-  async removeDecimal(value: BigNumber): Promise<string> {
-    return removeDecimal(value, await this.dp).toString();
-  }
-
-  async addDecimal(value: EthersBigNumber): Promise<BigNumber> {
-    return addDecimal(new BigNumber(value.toString()), await this.dp);
   }
 
   private mergeTransaction(tx: TxData) {

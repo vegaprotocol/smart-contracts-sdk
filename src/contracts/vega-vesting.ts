@@ -3,26 +3,43 @@ import { ethers, BigNumber as EthersBigNumber } from 'ethers';
 import { EnvironmentConfig } from '../config/ethereum';
 import { Networks } from '../config/vega';
 import vestingAbi from '../abis/vesting_abi.json';
+import tokenAbi from '../abis/vega_token_abi.json';
 import { BaseContract } from './base-contract';
 import { combineStakeEventsByVegaKey } from './stake-helpers';
 import { getTranchesFromHistory } from './tranche-helpers';
 import { Tranche } from './vega-web3-types';
-import { hexadecimalify } from '../utils';
+import { addDecimal, hexadecimalify, removeDecimal } from '../utils';
 
 export class VegaVesting extends BaseContract {
   public contract: ethers.Contract;
+  public tokenContract: ethers.Contract;
+  public dp: Promise<number>;
 
   constructor(
     network: Networks,
     provider: ethers.providers.Web3Provider,
     signer?: ethers.Signer
   ) {
-    super(network, provider, signer);
+    super(provider, signer);
+
+    const self = this;
+
+    this.tokenContract = new ethers.Contract(
+      EnvironmentConfig[network].vegaTokenAddress,
+      tokenAbi,
+      this.signer || this.provider
+    );
+
     this.contract = new ethers.Contract(
       EnvironmentConfig[network].vestingAddress,
       vestingAbi,
       this.signer || this.provider
     );
+
+    this.dp = (async () => {
+      const val = await self.tokenContract.decimals();
+      return Number(val);
+    })();
   }
 
   /** Executes vesting contracts stake_tokens function */
@@ -31,7 +48,7 @@ export class VegaVesting extends BaseContract {
     vegaKey: string,
     confirmations: number = 1
   ): Promise<ethers.ContractTransaction> {
-    const convertedAmount = await this.removeDecimal(amount);
+    const convertedAmount = removeDecimal(amount, await this.dp).toString();
 
     const tx = await this.contract.stake_tokens(
       convertedAmount,
@@ -49,7 +66,7 @@ export class VegaVesting extends BaseContract {
     vegaKey: string,
     confirmations: number = 1
   ): Promise<ethers.ContractTransaction> {
-    const convertedAmount = await this.removeDecimal(amount);
+    const convertedAmount = removeDecimal(amount, await this.dp).toString();
 
     const tx = await this.contract.remove_stake(
       convertedAmount,
@@ -67,14 +84,14 @@ export class VegaVesting extends BaseContract {
       address,
       hexadecimalify(vegaKey)
     );
-    const value = await this.addDecimal(res);
+    const value = addDecimal(new BigNumber(res.toString()), await this.dp);
     return value;
   }
 
   /** Returns the total amount currently staked */
   async totalStaked(): Promise<BigNumber> {
     const res: EthersBigNumber = await this.contract.total_staked();
-    const value = await this.addDecimal(res);
+    const value = addDecimal(new BigNumber(res.toString()), await this.dp);
     return value;
   }
 
@@ -86,7 +103,7 @@ export class VegaVesting extends BaseContract {
       lien: EthersBigNumber;
       total_in_all_tranches: EthersBigNumber;
     } = await this.contract.user_stats(address);
-    const value = await this.addDecimal(lien);
+    const value = addDecimal(new BigNumber(lien.toString()), await this.dp);
     return value;
   }
 
@@ -99,7 +116,7 @@ export class VegaVesting extends BaseContract {
       address,
       tranche
     );
-    const value = await this.addDecimal(amount);
+    const value = addDecimal(new BigNumber(amount.toString()), await this.dp);
     return value;
   }
 
@@ -112,7 +129,7 @@ export class VegaVesting extends BaseContract {
       address,
       tranche
     );
-    const value = await this.addDecimal(amount);
+    const value = addDecimal(new BigNumber(amount.toString()), await this.dp);
     return value;
   }
 
@@ -121,7 +138,7 @@ export class VegaVesting extends BaseContract {
     const amount: EthersBigNumber = await this.contract.user_total_all_tranches(
       account
     );
-    const value = await this.addDecimal(amount);
+    const value = addDecimal(new BigNumber(amount.toString()), await this.dp);
     return value;
   }
 

@@ -3,7 +3,8 @@ import { ethers } from 'ethers';
 import { EnvironmentConfig } from '../config/ethereum';
 import { Networks } from '../config/vega';
 import claimAbi from '../abis/claim_abi.json';
-import { asciiToHex } from '../utils';
+import tokenAbi from '../abis/vega_token_abi.json';
+import { asciiToHex, removeDecimal } from '../utils';
 import { BaseContract } from './base-contract';
 
 export const UNSPENT_CODE = '0x0000000000000000000000000000000000000000';
@@ -25,18 +26,34 @@ export const SPENT_CODE = '0x0000000000000000000000000000000000000001';
  */
 export class VegaClaim extends BaseContract {
   public contract: ethers.Contract;
+  public tokenContract: ethers.Contract;
+  public dp: Promise<number>;
 
   constructor(
     network: Networks,
     provider: ethers.providers.Web3Provider,
     signer?: ethers.Signer
   ) {
-    super(network, provider, signer);
+    super(provider, signer);
+
+    const self = this;
+
     this.contract = new ethers.Contract(
       EnvironmentConfig[network].claimAddress,
       claimAbi,
       this.signer || this.provider
     );
+
+    this.tokenContract = new ethers.Contract(
+      EnvironmentConfig[network].vegaTokenAddress,
+      tokenAbi,
+      this.signer || this.provider
+    );
+
+    this.dp = (async () => {
+      const val = await self.tokenContract.decimals();
+      return Number(val);
+    })();
   }
 
   /** Execute contracts commit_untargeted function */
@@ -79,7 +96,7 @@ export class VegaClaim extends BaseContract {
     },
     confirmations: number = 1
   ): Promise<ethers.ContractTransaction> {
-    const convertedAmount = await this.removeDecimal(amount);
+    const convertedAmount = removeDecimal(amount, await this.dp).toString();
     const tx = await this.contract[
       target != null ? 'claim_targeted' : 'claim_untargeted'
     ](

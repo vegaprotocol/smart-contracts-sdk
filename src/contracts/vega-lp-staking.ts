@@ -235,7 +235,7 @@ export class VegaLPStaking {
     const amount = removeDecimal(
       new BigNumber(Number.MAX_SAFE_INTEGER),
       await this.lpDecimals
-    );
+    ).toString();
     const contract = await this.lpContract;
     return contract.approve(spender, amount);
   }
