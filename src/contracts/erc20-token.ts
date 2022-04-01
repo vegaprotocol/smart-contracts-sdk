@@ -93,11 +93,9 @@ export class ERC20Token extends BaseContract {
     return tx;
   }
 
-  async faucet(
-    confirmations: number = 1
-  ): Promise<ethers.ContractTransaction | null> {
+  async faucet(confirmations: number = 1): Promise<ethers.ContractTransaction> {
     if (process.env.NODE_ENV === 'production') {
-      return null;
+      throw new Error('No faucet in production');
     }
     const tx = await this.contract.faucet();
     this.trackTransaction(tx, confirmations);
