@@ -1,6 +1,8 @@
 import { ethers, BigNumber as EthersBigNumber } from 'ethers';
 import erc20Abi from '../abis/erc20_abi.json';
+import erc20AbiFaucet from '../abis/erc20_abi_faucet.json';
 import BigNumber from 'bignumber.js';
+``;
 import { addDecimal, removeDecimal } from '../utils';
 import { BaseContract } from './base-contract';
 
@@ -17,7 +19,11 @@ export class ERC20Token extends BaseContract {
 
     const self = this;
 
-    this.contract = new ethers.Contract(address, erc20Abi, signer || provider);
+    this.contract = new ethers.Contract(
+      address,
+      process.env.NODE_ENV === 'production' ? erc20Abi : erc20AbiFaucet,
+      signer || provider
+    );
 
     this.dp = (async () => {
       const val = await self.contract.decimals();
@@ -83,6 +89,17 @@ export class ERC20Token extends BaseContract {
       await this.dp
     ).toString();
     const tx = await this.contract.approve(spender, amount);
+    this.trackTransaction(tx, confirmations);
+    return tx;
+  }
+
+  async faucet(
+    confirmations: number = 1
+  ): Promise<ethers.ContractTransaction | null> {
+    if (process.env.NODE_ENV === 'production') {
+      return null;
+    }
+    const tx = await this.contract.faucet();
     this.trackTransaction(tx, confirmations);
     return tx;
   }
