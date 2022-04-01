@@ -8,22 +8,23 @@ import { BaseContract } from './base-contract';
 export class ERC20Token extends BaseContract {
   public contract: ethers.Contract;
   public dp: Promise<number>;
+  private faucetable: boolean;
 
   constructor(
     address: string,
     provider: ethers.providers.Web3Provider,
-    signer?: ethers.Signer
+    signer?: ethers.Signer,
+    faucetable: boolean = false
   ) {
     super(provider, signer);
 
     const self = this;
-
+    this.faucetable = faucetable;
     this.contract = new ethers.Contract(
       address,
-      process.env.NODE_ENV === 'production' ? erc20Abi : erc20AbiFaucet,
+      faucetable ? erc20AbiFaucet : erc20Abi,
       signer || provider
     );
-
     this.dp = (async () => {
       const val = await self.contract.decimals();
       return Number(val);
@@ -93,8 +94,8 @@ export class ERC20Token extends BaseContract {
   }
 
   async faucet(confirmations: number = 1): Promise<ethers.ContractTransaction> {
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('No faucet in production');
+    if (!this.faucetable) {
+      throw new Error('Faucet function can not be called on this contract');
     }
     const tx = await this.contract.faucet();
     this.trackTransaction(tx, confirmations);
