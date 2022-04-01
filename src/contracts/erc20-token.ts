@@ -2,7 +2,6 @@ import { ethers, BigNumber as EthersBigNumber } from 'ethers';
 import erc20Abi from '../abis/erc20_abi.json';
 import erc20AbiFaucet from '../abis/erc20_abi_faucet.json';
 import BigNumber from 'bignumber.js';
-``;
 import { addDecimal, removeDecimal } from '../utils';
 import { BaseContract } from './base-contract';
 
